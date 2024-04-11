@@ -3,3 +3,13 @@
 GET {{PieShopApi_HostAddress}}/pies
 
 ###
+
+GET {{PieShopApi_HostAddress}}/pies/1
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/Apple
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/search?name=Apple
