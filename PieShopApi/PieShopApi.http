@@ -29,3 +29,87 @@ GET {{PieShopApi_HostAddress}}/Pies?page=1&size=500
 ###
 
 GET {{PieShopApi_HostAddress}}/Pies/filter
+
+###
+
+POST {{PieShopApi_HostAddress}}/Pies
+Content-Type: application/json
+
+{
+  "name": "Christmas pudding",
+  "description": "New Description"
+}
+
+###
+
+POST {{PieShopApi_HostAddress}}/Pies
+Content-Type: application/json
+
+{
+  "description": "New Description"
+}
+###
+
+POST {{PieShopApi_HostAddress}}/Pies
+Content-Type: application/json
+
+{
+  "name": null,
+  "description": "New Description"
+}
+
+###
+
+POST {{PieShopApi_HostAddress}}/Pies
+Content-Type: application/json
+
+{
+  "name": "pi",
+  "description": "New Description"
+}
+
+###
+
+PUT {{PieShopApi_HostAddress}}/Pies/1
+Content-Type: application/json
+
+{
+  "name": "update pie",
+  "description": "New Description"
+}
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies/1
+
+###
+
+PUT {{PieShopApi_HostAddress}}/Pies/999
+Content-Type: application/json
+
+{
+  "name": "update pie",
+  "description": "New Description"
+}
+
+###
+
+PUT {{PieShopApi_HostAddress}}/Pies/1
+Content-Type: application/json
+
+{
+  "name": "pi",
+  "description": "New Description"
+}
+
+###
+
+DELETE {{PieShopApi_HostAddress}}/Pies/1
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies/1
+
+###
+
+DELETE {{PieShopApi_HostAddress}}/Pies/999

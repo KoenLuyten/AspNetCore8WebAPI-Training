@@ -49,7 +49,7 @@ namespace PieShopApi.Controllers
         {
             var pie = await _pieRepository.GetByIdAsync(id);
 
-            if(pie == null)
+            if (pie == null)
                 return NotFound();
 
             return Ok(pie);
@@ -59,9 +59,9 @@ namespace PieShopApi.Controllers
         [Route("search")]
         public async Task<ActionResult<Pie>> SearchPie(string name)
         {
-            var pie =  await _pieRepository.GetByPartialNameAsync(name);
+            var pie = await _pieRepository.GetByPartialNameAsync(name);
 
-            if(pie == null)
+            if (pie == null)
                 return NotFound();
 
             return Ok(pie);
@@ -72,6 +72,46 @@ namespace PieShopApi.Controllers
         public async Task<ActionResult<Pie>> FilterPie()
         {
             throw new NotImplementedException();
+        }
+
+        [HttpPost]
+        public async Task<ActionResult<Pie>> CreatePie(Pie pie)
+        {
+            var createdPie = await _pieRepository.AddAsync(pie);
+
+            return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, createdPie);
+        }
+
+        [HttpPut]
+        [Route("{id:int}")]
+        public async Task<ActionResult<Pie>> UpdatePie(int id, Pie pie)
+        {
+            var currentPie = await _pieRepository.GetByIdAsync(id);
+
+            if (currentPie == null)
+                return NotFound();
+
+            currentPie.Name = pie.Name;
+            currentPie.Description = pie.Description;
+
+            await _pieRepository.UpdateAsync(currentPie);
+
+            return NoContent();
+        }
+
+        [HttpDelete]
+        [Route("{id:int}")]
+        public async Task<ActionResult> DeletePie(int id)
+        {
+            var pie = await _pieRepository.GetByIdAsync(id);
+            if (pie == null)
+            {
+                return NotFound();
+            }
+
+            await _pieRepository.DeleteAsync(pie);
+
+            return NoContent();
         }
     }
 
