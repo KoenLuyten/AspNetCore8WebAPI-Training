@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using PieShopApi.Models;
+using PieShopApi.Persistence;
+using System.Xml.Linq;
 
 namespace PieShopApi.Controllers
 {
@@ -7,47 +9,92 @@ namespace PieShopApi.Controllers
     [Route("pies")]
     public class PiesController : ControllerBase
     {
-        [HttpGet]
-        public JsonResult GetPies()
+        private readonly IPieRepository _pieRepository;
+
+        public PiesController(IPieRepository pieRepository)
         {
-            return new JsonResult(PieStore.GetAll());
+            _pieRepository = pieRepository;
+        }
+
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<Pie>>> GetPies(int? size, int? page)
+        {
+            if ((size.HasValue && (size.Value <= 0 || size.Value > 50)) || (page.HasValue && page.Value <= 0))
+            {
+                //return BadRequest(new
+                //{
+                //    error = "Bad input!",
+                //    details = "Size, if provided, must be between 1 and 50. Page, if provided, must be greater than 0."
+                //});
+
+                return Problem(
+                    title: "Bad Input",
+                    detail: "Size, if provided, must be between 1 and 50. Page, if provided, must be greater than 0.",
+                    type: "Paging_Error",
+                    statusCode: StatusCodes.Status400BadRequest
+                );
+            }
+
+            if (size.HasValue && size.Value > 0 && (page.HasValue && page > 0 || !page.HasValue))
+            {
+                return new JsonResult(await _pieRepository.GetPagedReponseAsync(page ?? 1, size.Value));
+            }
+
+            return new JsonResult(await _pieRepository.ListAllAsync());
         }
 
         [HttpGet]
         [Route("{id:int}")]
-        public ActionResult<Pie> GetPie(int id)
+        public async Task<ActionResult<Pie>> GetPie(int id)
         {
-            return PieStore.GetById(id);
+            var pie = await _pieRepository.GetByIdAsync(id);
+
+            if(pie == null)
+                return NotFound();
+
+            return Ok(pie);
         }
 
         [HttpGet]
         [Route("search")]
-        public ActionResult<Pie> SearchPie(string name)
+        public async Task<ActionResult<Pie>> SearchPie(string name)
         {
-            return PieStore.GetByPartialName(name);
+            var pie =  await _pieRepository.GetByPartialNameAsync(name);
+
+            if(pie == null)
+                return NotFound();
+
+            return Ok(pie);
+        }
+
+        [HttpGet]
+        [Route("filter")]
+        public async Task<ActionResult<Pie>> FilterPie()
+        {
+            throw new NotImplementedException();
         }
     }
 
-    public class PieStore
-    {
-        public static IEnumerable<Pie> GetAll()
-        {
-            return new List<Pie>
-            {
-                new Pie { Id = 1, Name = "Apple Pie", Description = "Tasty" },
-                new Pie { Id = 2, Name = "Cherry Pie", Description = "Yummy" },
-                new Pie { Id = 3, Name = "Pumpkin Pie", Description = "Delicious" }
-            };
-        }
+    //public class PieStore
+    //{
+    //    public static IEnumerable<Pie> GetAll()
+    //    {
+    //        return new List<Pie>
+    //        {
+    //            new Pie { Id = 1, Name = "Apple Pie", Description = "Tasty" },
+    //            new Pie { Id = 2, Name = "Cherry Pie", Description = "Yummy" },
+    //            new Pie { Id = 3, Name = "Pumpkin Pie", Description = "Delicious" }
+    //        };
+    //    }
 
-        public static Pie GetById(int id)
-        {
-            return GetAll().SingleOrDefault(p => p.Id == id);
-        }
+    //    public static Pie GetById(int id)
+    //    {
+    //        return GetAll().SingleOrDefault(p => p.Id == id);
+    //    }
 
-        public static Pie GetByPartialName(string name)
-        {
-            return GetAll().FirstOrDefault(p => p.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
-        }
-    }
+    //    public static Pie GetByPartialName(string name)
+    //    {
+    //        return GetAll().FirstOrDefault(p => p.Name.ToLowerInvariant().Contains(name.ToLowerInvariant()));
+    //    }
+    //}
 }

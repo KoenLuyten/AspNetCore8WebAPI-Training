@@ -13,3 +13,19 @@ GET {{PieShopApi_HostAddress}}/pies/Apple
 ###
 
 GET {{PieShopApi_HostAddress}}/pies/search?name=Apple
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?page=1&size=5
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/999
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?page=1&size=500
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies/filter
