@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using PieShopApi.Persistence;
 using System.Reflection;
@@ -9,6 +10,8 @@ builder.Services.AddDbContext<PieShopDbContext>(options =>
            .LogTo(Console.WriteLine));
 
 builder.Services.AddScoped(typeof(IPieRepository), typeof(PieRepository));
+
+builder.Services.AddSingleton(new FileExtensionContentTypeProvider());
 
 builder.Services.AddControllers();
 
