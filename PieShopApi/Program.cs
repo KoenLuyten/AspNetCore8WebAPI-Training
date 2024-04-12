@@ -10,6 +10,7 @@ builder.Services.AddDbContext<PieShopDbContext>(options =>
            .LogTo(Console.WriteLine));
 
 builder.Services.AddScoped(typeof(IPieRepository), typeof(PieRepository));
+builder.Services.AddScoped(typeof(IAllergyRepository), typeof(AllergyRepository));
 
 builder.Services.AddSingleton(new FileExtensionContentTypeProvider());
 

@@ -113,3 +113,15 @@ GET {{PieShopApi_HostAddress}}/Pies/1
 ###
 
 DELETE {{PieShopApi_HostAddress}}/Pies/999
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies/2
+
+###
+
+PUT {{PieShopApi_HostAddress}}/Pies/2/Allergies/1
+
+###
+
+DELETE {{PieShopApi_HostAddress}}/Pies/2/Allergies/1

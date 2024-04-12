@@ -50,7 +50,7 @@ namespace PieShopApi.Controllers
         }
 
         [HttpGet]
-        [Route("{id:int}")]
+        [Route("{id:int}", Name = "GetPie")]
         public async Task<ActionResult<PieDto>> GetPie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
