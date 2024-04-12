@@ -138,3 +138,11 @@ GET {{PieShopApi_HostAddress}}/Pies/51
 ###
 
 GET {{PieShopApi_HostAddress}}/Pies?category=Nutty
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?searchTerm=choco
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?category=Nutty&searchTerm=choco

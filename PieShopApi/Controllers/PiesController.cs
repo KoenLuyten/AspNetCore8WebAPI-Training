@@ -23,7 +23,7 @@ namespace PieShopApi.Controllers
 
         [HttpGet]
         //[LoggingFilter]
-        public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies(string? category, int? size, int? page)
+        public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies(string? category, string? searchTerm, int? size, int? page)
         {
             if ((size.HasValue && (size.Value <= 0 || size.Value > 50)) || (page.HasValue && page.Value <= 0))
             {
@@ -47,7 +47,7 @@ namespace PieShopApi.Controllers
                 return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieListPaged));
             }
 
-            var pieList = await _pieRepository.ListPiesAsync(category);
+            var pieList = await _pieRepository.ListPiesAsync(category, searchTerm);
 
             return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieList));
         }

@@ -43,7 +43,7 @@ namespace PieShopApi.Persistence
             return pie;
         }
 
-        public async Task<IEnumerable<Pie>> ListPiesAsync(string? category)
+        public async Task<IEnumerable<Pie>> ListPiesAsync(string? category, string searchTerm)
         {
             IQueryable<Pie> pies = _dbContext.Pies.Include(p => p.AllergyItems).AsQueryable();
 
@@ -52,6 +52,15 @@ namespace PieShopApi.Persistence
                 category = category.ToLower().Trim();
 
                 pies = pies.Where(p => p.Category.ToLower() == category);
+            }
+
+            if (!string.IsNullOrWhiteSpace(searchTerm))
+            {
+                searchTerm = searchTerm.ToLower().Trim();
+
+                pies = pies.Where(p => p.Name.ToLower().Contains(searchTerm)
+                            || p.Description.ToLower().Contains(searchTerm)
+                            || p.Category.ToLower().Contains(searchTerm));
             }
 
             return await pies.AsNoTracking()
@@ -64,6 +73,6 @@ namespace PieShopApi.Persistence
         Task<Pie?> GetByPartialNameAsync(string name);
         Task<Pie?> AddAllergyAsync(Pie pie, Allergy allergy);
         Task<Pie?> RemoveAllergyAsync(Pie pie, Allergy allergy);
-        Task<IEnumerable<Pie>> ListPiesAsync(string? category);
+        Task<IEnumerable<Pie>> ListPiesAsync(string? category, string? searchTerm);
     }
 }
