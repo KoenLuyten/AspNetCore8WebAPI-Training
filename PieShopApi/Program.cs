@@ -13,6 +13,8 @@ builder.Services.AddScoped(typeof(IPieRepository), typeof(PieRepository));
 
 builder.Services.AddSingleton(new FileExtensionContentTypeProvider());
 
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+
 builder.Services.AddControllers();
 
 builder.Services.AddProblemDetails(

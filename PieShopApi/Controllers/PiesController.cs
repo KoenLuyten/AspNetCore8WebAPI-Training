@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
 using PieShopApi.Models.Pies;
 using PieShopApi.Persistence;
 using System.Xml.Linq;
@@ -10,10 +11,12 @@ namespace PieShopApi.Controllers
     public class PiesController : ControllerBase
     {
         private readonly IPieRepository _pieRepository;
+        private readonly IMapper _mapper;
 
-        public PiesController(IPieRepository pieRepository)
+        public PiesController(IPieRepository pieRepository, IMapper mapper)
         {
             _pieRepository = pieRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
@@ -38,12 +41,12 @@ namespace PieShopApi.Controllers
             if (size.HasValue && size.Value > 0 && (page.HasValue && page > 0 || !page.HasValue))
             {
                 var pieListPaged = await _pieRepository.GetPagedReponseAsync(page ?? 1, size.Value);
-                return Ok(pieListPaged.Select(x => new PieForListDto { Id = x.Id, Name = x.Name, Description = x.Description }));
+                return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieListPaged));
             }
 
             var pieList = await _pieRepository.ListAllAsync();
 
-            return Ok(pieList.Select(x => new PieForListDto { Id = x.Id, Name = x.Name, Description = x.Description }));
+            return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieList));
         }
 
         [HttpGet]
@@ -55,13 +58,7 @@ namespace PieShopApi.Controllers
             if (pie == null)
                 return NotFound();
 
-            var pieDto = new PieDto
-            {
-                Id = pie.Id,
-                Name = pie.Name,
-                Description = pie.Description,
-                AllergyItems = pie.AllergyItems.Select(x => x.Name).ToList()
-            };
+            var pieDto = _mapper.Map<PieDto>(pie);
 
             return Ok(pieDto);
         }
@@ -88,23 +85,11 @@ namespace PieShopApi.Controllers
         [HttpPost]
         public async Task<ActionResult<Pie>> CreatePie(PieForCreationDto pie)
         {
-            var pieToAdd = new Pie
-            {
-                Name = pie.Name,
-                Description = pie.Description
-            };
+            var pieToAdd = _mapper.Map<Pie>(pie);
 
             var createdPie = await _pieRepository.AddAsync(pieToAdd);
 
-            var createdPieDto = new PieDto
-            {
-                Id = createdPie.Id,
-                Name = createdPie.Name,
-                Description = createdPie.Description,
-                AllergyItems = createdPie.AllergyItems.Select(x => x.Name).ToList()
-            };
-
-            return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, createdPieDto);
+            return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, _mapper.Map<PieDto>(createdPie));
         }
 
         [HttpPut]
@@ -116,8 +101,7 @@ namespace PieShopApi.Controllers
             if (currentPie == null)
                 return NotFound();
 
-            currentPie.Name = pie.Name;
-            currentPie.Description = pie.Description;
+            _mapper.Map(pie, currentPie);
 
             await _pieRepository.UpdateAsync(currentPie);
 
