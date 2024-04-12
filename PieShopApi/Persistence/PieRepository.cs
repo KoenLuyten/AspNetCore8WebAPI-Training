@@ -1,5 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PieShopApi.Models;
+using PieShopApi.Models.Pies;
 
 namespace PieShopApi.Persistence
 {
@@ -7,6 +7,14 @@ namespace PieShopApi.Persistence
     {
         public PieRepository(PieShopDbContext dbContext) : base(dbContext)
         {
+        }
+
+        public async override Task<Pie?> GetByIdAsync(int id)
+        {
+            Pie? pie = await _dbContext.Pies.Include(p => p.AllergyItems)
+                                            .FirstOrDefaultAsync(p => p.Id == id);
+
+            return pie;
         }
 
         public async Task<Pie?> GetByPartialNameAsync(string name)

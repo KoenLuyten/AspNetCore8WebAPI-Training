@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using PieShopApi.Models;
+using PieShopApi.Models.Allergies;
+using PieShopApi.Models.Pies;
 
 namespace PieShopApi.Persistence
 {
@@ -10,9 +11,22 @@ namespace PieShopApi.Persistence
         }
 
         public DbSet<Pie> Pies { get; set; }
+        public DbSet<Allergy> Allergies { get; set; }
 
         override protected void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Allergy>().HasData(
+                new Allergy { Id = 1, Name = "Cow's milk" },
+                new Allergy { Id = 2, Name = "Eggs" },
+                new Allergy { Id = 3, Name = "Tree nuts" },
+                new Allergy { Id = 4, Name = "Peanuts" },
+                new Allergy { Id = 5, Name = "Shellfish" },
+                new Allergy { Id = 6, Name = "Wheat" },
+                new Allergy { Id = 7, Name = "Soy" },
+                new Allergy { Id = 8, Name = "Fish" },
+                new Allergy { Id = 9, Name = "Sesame" }
+            );
+
             modelBuilder.Entity<Pie>().HasData(
                 new Pie { Id = 1, Name = "Apple Pie", Description = "Tasty" },
                 new Pie { Id = 2, Name = "Cherry Pie", Description = "Yummy" },
@@ -65,6 +79,16 @@ namespace PieShopApi.Persistence
                 new Pie { Id = 49, Name = "White Chocolate Raspberry Pie", Description = "Velvety-rich" },
                 new Pie { Id = 50, Name = "Apricot Pie", Description = "Honeyed" }
             );
+
+            modelBuilder.Entity<Pie>()
+                .HasMany(p => p.AllergyItems)
+                .WithMany(a => a.Pies)
+                .UsingEntity(p => p.HasData(
+                    new { PiesId = 1, AllergyItemsId = 1 },
+                    new { PiesId = 1, AllergyItemsId = 2 },
+                    new { PiesId = 1, AllergyItemsId = 6 },
+                    new { PiesId = 51, AllergyItemsId = -1 }
+                    ));
 
             base.OnModelCreating(modelBuilder);
 
