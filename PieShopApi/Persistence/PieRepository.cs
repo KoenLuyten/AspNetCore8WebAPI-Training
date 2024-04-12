@@ -1,6 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 using PieShopApi.Models.Allergies;
 using PieShopApi.Models.Pies;
+using System.Drawing;
 
 namespace PieShopApi.Persistence
 {
@@ -40,6 +42,21 @@ namespace PieShopApi.Persistence
 
             return pie;
         }
+
+        public async Task<IEnumerable<Pie>> ListPiesAsync(string? category)
+        {
+            IQueryable<Pie> pies = _dbContext.Pies.Include(p => p.AllergyItems).AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(category))
+            {
+                category = category.ToLower().Trim();
+
+                pies = pies.Where(p => p.Category.ToLower() == category);
+            }
+
+            return await pies.AsNoTracking()
+                             .ToListAsync();
+        }
     }
 
     public interface IPieRepository : IAsyncRepository<Pie>
@@ -47,5 +64,6 @@ namespace PieShopApi.Persistence
         Task<Pie?> GetByPartialNameAsync(string name);
         Task<Pie?> AddAllergyAsync(Pie pie, Allergy allergy);
         Task<Pie?> RemoveAllergyAsync(Pie pie, Allergy allergy);
+        Task<IEnumerable<Pie>> ListPiesAsync(string? category);
     }
 }

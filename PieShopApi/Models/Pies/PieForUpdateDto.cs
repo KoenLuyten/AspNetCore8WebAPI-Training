@@ -10,5 +10,8 @@ namespace PieShopApi.Models.Pies
 
         [MaxLength(500)]
         public required string Description { get; set; }
+
+        [Required]
+        public string Category { get; set; } = "Other";
     }
 }

@@ -134,3 +134,7 @@ GET {{PieShopApi_HostAddress}}/Pies/2
 ###
 
 GET {{PieShopApi_HostAddress}}/Pies/51
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?category=Nutty

@@ -19,6 +19,8 @@ namespace PieShopApi.Models.Pies
         [MaxLength(500)]
         public required string Description { get; set; }
 
+        public required string Category { get; set; }
+
         public ICollection<Allergy> AllergyItems { get; set; }
     }
 }
