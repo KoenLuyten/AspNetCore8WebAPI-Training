@@ -1,5 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PieShopApi.Models;
+using PieShopApi.Models.Pies;
 using PieShopApi.Persistence;
 using System.Xml.Linq;
 
@@ -17,7 +17,7 @@ namespace PieShopApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pie>>> GetPies(int? size, int? page)
+        public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies(int? size, int? page)
         {
             if ((size.HasValue && (size.Value <= 0 || size.Value > 50)) || (page.HasValue && page.Value <= 0))
             {
@@ -37,22 +37,33 @@ namespace PieShopApi.Controllers
 
             if (size.HasValue && size.Value > 0 && (page.HasValue && page > 0 || !page.HasValue))
             {
-                return new JsonResult(await _pieRepository.GetPagedReponseAsync(page ?? 1, size.Value));
+                var pieListPaged = await _pieRepository.GetPagedReponseAsync(page ?? 1, size.Value);
+                return Ok(pieListPaged.Select(x => new PieForListDto { Id = x.Id, Name = x.Name, Description = x.Description }));
             }
 
-            return new JsonResult(await _pieRepository.ListAllAsync());
+            var pieList = await _pieRepository.ListAllAsync();
+
+            return Ok(pieList.Select(x => new PieForListDto { Id = x.Id, Name = x.Name, Description = x.Description }));
         }
 
         [HttpGet]
         [Route("{id:int}")]
-        public async Task<ActionResult<Pie>> GetPie(int id)
+        public async Task<ActionResult<PieDto>> GetPie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
 
             if (pie == null)
                 return NotFound();
 
-            return Ok(pie);
+            var pieDto = new PieDto
+            {
+                Id = pie.Id,
+                Name = pie.Name,
+                Description = pie.Description,
+                AllergyItems = pie.AllergyItems.Select(x => x.Name).ToList()
+            };
+
+            return Ok(pieDto);
         }
 
         [HttpGet]
@@ -75,16 +86,30 @@ namespace PieShopApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Pie>> CreatePie(Pie pie)
+        public async Task<ActionResult<Pie>> CreatePie(PieForCreationDto pie)
         {
-            var createdPie = await _pieRepository.AddAsync(pie);
+            var pieToAdd = new Pie
+            {
+                Name = pie.Name,
+                Description = pie.Description
+            };
 
-            return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, createdPie);
+            var createdPie = await _pieRepository.AddAsync(pieToAdd);
+
+            var createdPieDto = new PieDto
+            {
+                Id = createdPie.Id,
+                Name = createdPie.Name,
+                Description = createdPie.Description,
+                AllergyItems = createdPie.AllergyItems.Select(x => x.Name).ToList()
+            };
+
+            return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, createdPieDto);
         }
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<ActionResult<Pie>> UpdatePie(int id, Pie pie)
+        public async Task<ActionResult<Pie>> UpdatePie(int id, PieForUpdateDto pie)
         {
             var currentPie = await _pieRepository.GetByIdAsync(id);
 

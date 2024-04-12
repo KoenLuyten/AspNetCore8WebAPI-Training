@@ -1,16 +1,14 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace PieShopApi.Models
+namespace PieShopApi.Models.Pies
 {
-    public class Pie
+    public class PieForUpdateDto
     {
-        public int Id { get; set; }
-
         [Required]
         [Length(3, 50)]
         public required string Name { get; set; }
 
-        [Required]
+        [MaxLength(500)]
         public required string Description { get; set; }
     }
 }
