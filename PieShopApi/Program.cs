@@ -1,6 +1,10 @@
+using Microsoft.AspNetCore.OData;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OData.ModelBuilder;
 using PieShopApi.Filters;
+using PieShopApi.Models.Allergies;
+using PieShopApi.Models.Pies;
 using PieShopApi.Persistence;
 using System.Reflection;
 
@@ -17,10 +21,20 @@ builder.Services.AddSingleton(new FileExtensionContentTypeProvider());
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+var modelBuilder = new ODataConventionModelBuilder();
+modelBuilder.EntityType<Allergy>();
+modelBuilder.EntitySet<Pie>("Pies");
+
 builder.Services.AddControllers((options) =>
 {
     options.Filters.Add<LoggingFilterAttribute>();
-});
+}).AddOData(
+    options => options.Select().Filter().OrderBy()
+                      .Expand().Count().SetMaxTop(null)
+                      .AddRouteComponents(
+                            routePrefix: "odata",
+                            model: modelBuilder.GetEdmModel())
+);
 
 builder.Services.AddProblemDetails(
     options =>

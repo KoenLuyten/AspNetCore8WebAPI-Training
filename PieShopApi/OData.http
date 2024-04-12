@@ -1,0 +1,57 @@
+@odata_HostAddress = https://localhost:7043/odata
+
+GET {{odata_HostAddress}}/$metadata
+
+###
+
+GET {{odata_HostAddress}}/Pies
+
+
+###
+
+GET {{odata_HostAddress}}/$metadata#Pies
+
+###
+
+GET {{odata_HostAddress}}/Pies/$count
+
+
+###
+GET {{odata_HostAddress}}/Pies(1)
+
+###
+GET {{odata_HostAddress}}/Pies/1
+
+###
+
+GET {{odata_HostAddress}}/$metadata#Pies/$entity
+
+###
+GET {{odata_HostAddress}}/Pies?$filter=Name%20eq%20'Cherry%20Pie'
+# https://localhost:7165/odata/Pies?$filter=Name eq 'Cherry Pie'
+
+###
+GET {{odata_HostAddress}}/Pies?$filter=contains(Name,'Choco')%20OR%20contains(Description,'Choco')
+#GET {{odata_HostAddress}}/Pies?$filter=contains(Name,'Choco') OR contains(Description,'Choco')
+
+
+###
+GET {{odata_HostAddress}}/Pies?$select=Id,Name
+
+###
+GET {{odata_HostAddress}}/Pies?$orderby=Name
+
+###
+
+GET {{odata_HostAddress}}/Pies?$top=10&$skip=10&$count=true
+
+###
+GET {{odata_HostAddress}}/Pies?$expand=AllergyItems
+
+###
+GET {{odata_HostAddress}}/Pies?$expand=AllergyItems($select=Name)
+
+###
+
+GET {{odata_HostAddress}}/Pies?$apply=groupby((Category),aggregate($count%20as%20Count))
+
