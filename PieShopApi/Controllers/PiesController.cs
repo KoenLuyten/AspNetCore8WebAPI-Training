@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using PieShopApi.Filters;
 using PieShopApi.Models.Pies;
 using PieShopApi.Persistence;
 using System.Xml.Linq;
@@ -8,6 +9,7 @@ namespace PieShopApi.Controllers
 {
     [ApiController]
     [Route("pies")]
+    //[LoggingFilter]
     public class PiesController : ControllerBase
     {
         private readonly IPieRepository _pieRepository;
@@ -20,6 +22,7 @@ namespace PieShopApi.Controllers
         }
 
         [HttpGet]
+        //[LoggingFilter]
         public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies(int? size, int? page)
         {
             if ((size.HasValue && (size.Value <= 0 || size.Value > 50)) || (page.HasValue && page.Value <= 0))

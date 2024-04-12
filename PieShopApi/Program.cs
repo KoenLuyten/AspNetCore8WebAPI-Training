@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using PieShopApi.Filters;
 using PieShopApi.Persistence;
 using System.Reflection;
 
@@ -16,7 +17,10 @@ builder.Services.AddSingleton(new FileExtensionContentTypeProvider());
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
-builder.Services.AddControllers();
+builder.Services.AddControllers((options) =>
+{
+    options.Filters.Add<LoggingFilterAttribute>();
+});
 
 builder.Services.AddProblemDetails(
     options =>
