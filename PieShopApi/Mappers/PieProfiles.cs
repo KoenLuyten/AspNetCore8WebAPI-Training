@@ -12,9 +12,13 @@ namespace PieShopApi.Mappers
 
             CreateMap<Models.Pies.Pie, Models.Pies.PieForListDto>();
 
-            CreateMap<Models.Pies.PieForCreationDto, Models.Pies.Pie>();
+            CreateMap<Models.Pies.PieForCreationDto, Models.Pies.Pie>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.AllergyItems, opt => opt.Ignore());
 
-            CreateMap<Models.Pies.PieForUpdateDto, Models.Pies.Pie>();
+            CreateMap<Models.Pies.PieForUpdateDto, Models.Pies.Pie>()
+                .ForMember(dest => dest.Id, opt => opt.Ignore())
+                .ForMember(dest => dest.AllergyItems, opt => opt.Ignore());
         }
     }
 }
