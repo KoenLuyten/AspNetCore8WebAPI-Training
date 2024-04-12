@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using PieShopApi.Filters;
 using PieShopApi.Models.Allergies;
 using PieShopApi.Models.Pies;
 
@@ -12,6 +13,8 @@ namespace PieShopApi.Persistence
 
         public DbSet<Pie> Pies { get; set; }
         public DbSet<Allergy> Allergies { get; set; }
+
+        public DbSet<AuditEntry> AuditEntries { get; set; }
 
         override protected void OnModelCreating(ModelBuilder modelBuilder)
         {

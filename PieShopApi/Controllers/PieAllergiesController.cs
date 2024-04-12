@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using PieShopApi.Models.Allergies;
+using PieShopApi.Filters;
 using PieShopApi.Persistence;
 
 namespace PieShopApi.Controllers
 {
     [ApiController]
     [Route("pies/{pieId:int}/allergies")]
+    [TypeFilter(typeof(AuditFilter))]
     public class PieAllergiesController: ControllerBase
     {
         private readonly IPieRepository _pieRepository;
