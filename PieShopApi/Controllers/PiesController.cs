@@ -1,5 +1,7 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using PieShopApi.Models;
+﻿using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using PieShopApi.Filters;
+using PieShopApi.Models.Pies;
 using PieShopApi.Persistence;
 using System.Xml.Linq;
 
@@ -7,52 +9,55 @@ namespace PieShopApi.Controllers
 {
     [ApiController]
     [Route("pies")]
+    //[LoggingFilter]
     public class PiesController : ControllerBase
     {
         private readonly IPieRepository _pieRepository;
+        private readonly IMapper _mapper;
 
-        public PiesController(IPieRepository pieRepository)
+        public PiesController(IPieRepository pieRepository, IMapper mapper)
         {
             _pieRepository = pieRepository;
+            _mapper = mapper;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Pie>>> GetPies(int? size, int? page)
+        //[LoggingFilter]
+        public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies([FromQuery] PieListParameters parameters)
         {
-            if ((size.HasValue && (size.Value <= 0 || size.Value > 50)) || (page.HasValue && page.Value <= 0))
+            var pieList = await _pieRepository.ListPiesAsync(parameters.Category, 
+                                                             parameters.SearchTerm, 
+                                                             parameters.PageNumber, 
+                                                             parameters.PageSize);
+
+            var metadata = new
             {
-                //return BadRequest(new
-                //{
-                //    error = "Bad input!",
-                //    details = "Size, if provided, must be between 1 and 50. Page, if provided, must be greater than 0."
-                //});
+                pieList.TotalCount,
+                pieList.PageSize,
+                pieList.CurrentPage,
+                pieList.TotalPages,
+                pieList.HasNext,
+                pieList.HasPrevious
+            };
 
-                return Problem(
-                    title: "Bad Input",
-                    detail: "Size, if provided, must be between 1 and 50. Page, if provided, must be greater than 0.",
-                    type: "Paging_Error",
-                    statusCode: StatusCodes.Status400BadRequest
-                );
-            }
+            Response.Headers.Append("X-Pagination", System.Text.Json.JsonSerializer.Serialize(metadata));
 
-            if (size.HasValue && size.Value > 0 && (page.HasValue && page > 0 || !page.HasValue))
-            {
-                return new JsonResult(await _pieRepository.GetPagedReponseAsync(page ?? 1, size.Value));
-            }
-
-            return new JsonResult(await _pieRepository.ListAllAsync());
+            return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieList));
         }
 
         [HttpGet]
-        [Route("{id:int}")]
-        public async Task<ActionResult<Pie>> GetPie(int id)
+        [PieAllergyFilter]
+        [Route("{id:int}", Name = "GetPie")]
+        public async Task<ActionResult<PieDto>> GetPie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
 
             if (pie == null)
                 return NotFound();
 
-            return Ok(pie);
+            var pieDto = _mapper.Map<PieDto>(pie);
+
+            return Ok(pieDto);
         }
 
         [HttpGet]
@@ -75,24 +80,25 @@ namespace PieShopApi.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult<Pie>> CreatePie(Pie pie)
+        public async Task<ActionResult<Pie>> CreatePie(PieForCreationDto pie)
         {
-            var createdPie = await _pieRepository.AddAsync(pie);
+            var pieToAdd = _mapper.Map<Pie>(pie);
 
-            return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, createdPie);
+            var createdPie = await _pieRepository.AddAsync(pieToAdd);
+
+            return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, _mapper.Map<PieDto>(createdPie));
         }
 
         [HttpPut]
         [Route("{id:int}")]
-        public async Task<ActionResult<Pie>> UpdatePie(int id, Pie pie)
+        public async Task<ActionResult<Pie>> UpdatePie(int id, PieForUpdateDto pie)
         {
             var currentPie = await _pieRepository.GetByIdAsync(id);
 
             if (currentPie == null)
                 return NotFound();
 
-            currentPie.Name = pie.Name;
-            currentPie.Description = pie.Description;
+            _mapper.Map(pie, currentPie);
 
             await _pieRepository.UpdateAsync(currentPie);
 

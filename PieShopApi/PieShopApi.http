@@ -113,3 +113,52 @@ GET {{PieShopApi_HostAddress}}/Pies/1
 ###
 
 DELETE {{PieShopApi_HostAddress}}/Pies/999
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies/2
+
+###
+
+PUT {{PieShopApi_HostAddress}}/Pies/2/Allergies/1
+
+###
+
+DELETE {{PieShopApi_HostAddress}}/Pies/2/Allergies/1
+
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies/2
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies/51
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?category=Nutty
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?searchTerm=choco
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?category=Nutty&searchTerm=choco
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?page=1&size=5&category=Nutty
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies?page=2&size=5
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?search=choco
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?page=1&size=5&category=Fruit&search=pie
