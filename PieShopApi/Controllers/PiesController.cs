@@ -23,31 +23,24 @@ namespace PieShopApi.Controllers
 
         [HttpGet]
         //[LoggingFilter]
-        public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies(string? category, string? searchTerm, int? size, int? page)
+        public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies([FromQuery] PieListParameters parameters)
         {
-            if ((size.HasValue && (size.Value <= 0 || size.Value > 50)) || (page.HasValue && page.Value <= 0))
+            var pieList = await _pieRepository.ListPiesAsync(parameters.Category, 
+                                                             parameters.SearchTerm, 
+                                                             parameters.PageNumber, 
+                                                             parameters.PageSize);
+
+            var metadata = new
             {
-                //return BadRequest(new
-                //{
-                //    error = "Bad input!",
-                //    details = "Size, if provided, must be between 1 and 50. Page, if provided, must be greater than 0."
-                //});
+                pieList.TotalCount,
+                pieList.PageSize,
+                pieList.CurrentPage,
+                pieList.TotalPages,
+                pieList.HasNext,
+                pieList.HasPrevious
+            };
 
-                return Problem(
-                    title: "Bad Input",
-                    detail: "Size, if provided, must be between 1 and 50. Page, if provided, must be greater than 0.",
-                    type: "Paging_Error",
-                    statusCode: StatusCodes.Status400BadRequest
-                );
-            }
-
-            if (size.HasValue && size.Value > 0 && (page.HasValue && page > 0 || !page.HasValue))
-            {
-                var pieListPaged = await _pieRepository.GetPagedReponseAsync(page ?? 1, size.Value);
-                return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieListPaged));
-            }
-
-            var pieList = await _pieRepository.ListPiesAsync(category, searchTerm);
+            Response.Headers.Append("X-Pagination", System.Text.Json.JsonSerializer.Serialize(metadata));
 
             return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieList));
         }

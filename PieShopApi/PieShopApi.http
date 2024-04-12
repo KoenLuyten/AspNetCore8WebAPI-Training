@@ -146,3 +146,19 @@ GET {{PieShopApi_HostAddress}}/Pies?searchTerm=choco
 ###
 
 GET {{PieShopApi_HostAddress}}/Pies?category=Nutty&searchTerm=choco
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?page=1&size=5&category=Nutty
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies?page=2&size=5
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?search=choco
+
+###
+
+GET {{PieShopApi_HostAddress}}/Pies?page=1&size=5&category=Fruit&search=pie

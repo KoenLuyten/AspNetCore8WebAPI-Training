@@ -43,7 +43,7 @@ namespace PieShopApi.Persistence
             return pie;
         }
 
-        public async Task<IEnumerable<Pie>> ListPiesAsync(string? category, string searchTerm)
+        public async Task<PagedList<Pie>> ListPiesAsync(string? category, string? searchTerm, int pageNumber, int pageSize)
         {
             IQueryable<Pie> pies = _dbContext.Pies.Include(p => p.AllergyItems).AsQueryable();
 
@@ -63,8 +63,7 @@ namespace PieShopApi.Persistence
                             || p.Category.ToLower().Contains(searchTerm));
             }
 
-            return await pies.AsNoTracking()
-                             .ToListAsync();
+            return await PagedList<Pie>.ToPagedList(pies, pageNumber, pageSize);
         }
     }
 
@@ -73,6 +72,6 @@ namespace PieShopApi.Persistence
         Task<Pie?> GetByPartialNameAsync(string name);
         Task<Pie?> AddAllergyAsync(Pie pie, Allergy allergy);
         Task<Pie?> RemoveAllergyAsync(Pie pie, Allergy allergy);
-        Task<IEnumerable<Pie>> ListPiesAsync(string? category, string? searchTerm);
+        Task<PagedList<Pie>> ListPiesAsync(string? category, string? searchTerm, int pageNumber, int pageSize);
     }
 }
