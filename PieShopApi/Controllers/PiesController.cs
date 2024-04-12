@@ -53,6 +53,7 @@ namespace PieShopApi.Controllers
         }
 
         [HttpGet]
+        [PieAllergyFilter]
         [Route("{id:int}", Name = "GetPie")]
         public async Task<ActionResult<PieDto>> GetPie(int id)
         {

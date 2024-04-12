@@ -16,6 +16,7 @@ namespace PieShopApi.Persistence
         override protected void OnModelCreating(ModelBuilder modelBuilder)
         {
             modelBuilder.Entity<Allergy>().HasData(
+                new Allergy { Id = -1, Name = "None" },
                 new Allergy { Id = 1, Name = "Cow's milk" },
                 new Allergy { Id = 2, Name = "Eggs" },
                 new Allergy { Id = 3, Name = "Tree nuts" },
@@ -77,7 +78,8 @@ namespace PieShopApi.Persistence
                 new Pie { Id = 47, Name = "Macadamia Nut Pie", Description = "Crunchy" },
                 new Pie { Id = 48, Name = "Cranberry Pie", Description = "Tangy" },
                 new Pie { Id = 49, Name = "White Chocolate Raspberry Pie", Description = "Velvety-rich" },
-                new Pie { Id = 50, Name = "Apricot Pie", Description = "Honeyed" }
+                new Pie { Id = 50, Name = "Apricot Pie", Description = "Honeyed" },
+                new Pie { Id = 51, Name = "Vegan & Gluten-Free Apple Pie", Description = "Allergy free" }
             );
 
             modelBuilder.Entity<Pie>()
