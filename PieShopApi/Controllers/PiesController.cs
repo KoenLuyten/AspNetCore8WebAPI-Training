@@ -78,7 +78,15 @@ namespace PieShopApi.Controllers
         [Route("filter")]
         public async Task<ActionResult<Pie>> FilterPie()
         {
-            throw new NotImplementedException();
+            try
+            {
+                throw new NotImplementedException();
+            }
+            catch (NotImplementedException ex)
+            {
+                _logger.LogWarning(ex, "Filter method not implemented");
+                throw;
+            }
         }
 
         [HttpPost]
