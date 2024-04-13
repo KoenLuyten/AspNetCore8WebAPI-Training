@@ -31,6 +31,7 @@ builder.Services.AddProblemDetails(
             ctx.ProblemDetails.Extensions.Add("version", Assembly.GetExecutingAssembly().GetName().Version);
         }
 );
+builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
