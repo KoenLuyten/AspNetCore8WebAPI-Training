@@ -14,11 +14,13 @@ namespace PieShopApi.Controllers
     {
         private readonly IPieRepository _pieRepository;
         private readonly IMapper _mapper;
+        private readonly ILogger<PiesController> _logger;
 
-        public PiesController(IPieRepository pieRepository, IMapper mapper)
+        public PiesController(IPieRepository pieRepository, IMapper mapper, ILogger<PiesController> logger)
         {
             _pieRepository = pieRepository;
             _mapper = mapper;
+            _logger = logger;
         }
 
         [HttpGet]
@@ -86,6 +88,8 @@ namespace PieShopApi.Controllers
 
             var createdPie = await _pieRepository.AddAsync(pieToAdd);
 
+            _logger.LogInformation("Pie created: {id}", createdPie.Id);
+
             return CreatedAtAction(nameof(GetPie), new { id = createdPie.Id }, _mapper.Map<PieDto>(createdPie));
         }
 
@@ -96,8 +100,10 @@ namespace PieShopApi.Controllers
             var currentPie = await _pieRepository.GetByIdAsync(id);
 
             if (currentPie == null)
+            {
+                _logger.LogWarning("Tried to update an unexisting pie: {id}", id);
                 return NotFound();
-
+            }
             _mapper.Map(pie, currentPie);
 
             await _pieRepository.UpdateAsync(currentPie);
