@@ -1,3 +1,5 @@
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using PieShopApi.Filters;
@@ -29,6 +31,7 @@ builder.Services.AddProblemDetails(
             ctx.ProblemDetails.Extensions.Add("version", Assembly.GetExecutingAssembly().GetName().Version);
         }
 );
+builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
@@ -36,7 +39,47 @@ app.MapControllers();
 
 if(!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler();
+    app.UseExceptionHandler(options =>
+    {
+        options.Run(context =>
+        {
+            context.Response.StatusCode = 500;
+            context.Response.ContentType = "application/json";
+
+            var errorFeature = context.Features.Get<IExceptionHandlerFeature>();
+            if (errorFeature != null)
+            {
+                if (errorFeature.Error is NotImplementedException)
+                {
+                    context.Response.StatusCode = 501;
+
+                    var problemDetails = new ProblemDetails
+                    {
+                        Status = 501,
+                        Title = "Not Implemented",
+                        Detail = errorFeature.Error.Message,
+                        Instance = context.Request.Path
+                    };
+
+                    return context.Response.WriteAsJsonAsync(problemDetails);
+                }
+                else
+                {
+                    var problemDetails = new ProblemDetails
+                    {
+                        Status = 500,
+                        Title = "An error occurred",
+                        Detail = errorFeature.Error.Message,
+                        Instance = context.Request.Path
+                    };
+
+                    return context.Response.WriteAsJsonAsync(problemDetails);
+                }
+            }
+
+            return Task.CompletedTask;
+        });
+    });
 }
 
 using (var context = new PieShopDbContext(builder.Services.BuildServiceProvider()

@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Moq;
 using PieShopApi.Controllers;
 using PieShopApi.Models.Pies;
@@ -21,7 +22,7 @@ namespace PieShopApiTests.Controllers
             var pieDto = new PieDto { Name = "pie name", Description = "pie description" };
             mockMapper.Setup(m => m.Map<PieDto>(It.IsAny<Pie>())).Returns(pieDto);
 
-            var controller = new PiesController(mockPieRepository.Object, mockMapper.Object);
+            var controller = new PiesController(mockPieRepository.Object, mockMapper.Object, null);
 
             //act
             var result = await controller.GetPie(1);
@@ -41,7 +42,7 @@ namespace PieShopApiTests.Controllers
 
             mockPieRepository.Setup(p => p.GetByIdAsync(It.IsAny<int>())).ReturnsAsync((Pie)null);
 
-            var controller = new PiesController(mockPieRepository.Object, null);
+            var controller = new PiesController(mockPieRepository.Object, null, null);
 
             //act
             var result = await controller.GetPie(1);
@@ -56,6 +57,7 @@ namespace PieShopApiTests.Controllers
             //arrange
             var mockPieRepository = new Mock<IPieRepository>();
             var mockMapper = new Mock<IMapper>();
+            var mockLogger = new Mock<ILogger<PiesController>>();
 
             var pieForCreationDto = new PieForCreationDto { Name = "pie name", Description = "pie description" };
             var pie = new Pie { Name = "pie name", Description = "pie description", Category = "pie category" };
@@ -66,7 +68,7 @@ namespace PieShopApiTests.Controllers
             mockPieRepository.Setup(p => p.AddAsync(It.IsAny<Pie>())).ReturnsAsync(createdPie).Verifiable(Times.Once());
             mockMapper.Setup(m => m.Map<PieDto>(It.IsAny<Pie>())).Returns(createdPieDto).Verifiable(Times.Once());
 
-            var controller = new PiesController(mockPieRepository.Object, mockMapper.Object);
+            var controller = new PiesController(mockPieRepository.Object, mockMapper.Object, mockLogger.Object);
 
             //act
             var result = await controller.CreatePie(pieForCreationDto);
