@@ -90,3 +90,5 @@ using (var context = new PieShopDbContext(builder.Services.BuildServiceProvider(
 }
 
 app.Run();
+
+public partial class Program { }
