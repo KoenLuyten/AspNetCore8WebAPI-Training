@@ -4,6 +4,8 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <ApplicationInsightsResourceId>/subscriptions/3258674b-7534-4b9d-ad14-6e3073fdbbcc/resourceGroups/rg-apitraining-demo/providers/microsoft.insights/components/kl-apitraining-demo</ApplicationInsightsResourceId>
+    <UserSecretsId>1689b487-c356-4e8a-aadc-1d581bc8bfe6</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
