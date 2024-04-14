@@ -4,19 +4,19 @@ using Microsoft.AspNetCore.Mvc;
 using PieShopApi.Models.Pies;
 using PieShopApi.Persistence;
 
-namespace PieShopApi.Controllers
+namespace PieShopApi.Controllers.v2
 {
     [ApiController]
     [ApiVersion("2.0")]
     [Route("v{version:apiVersion}/pies")]
     //[LoggingFilter]
-    public class PiesV2Controller : ControllerBase
+    public class PiesController : ControllerBase
     {
         private readonly IPieRepository _pieRepository;
         private readonly IMapper _mapper;
         private readonly ILogger<PiesController> _logger;
 
-        public PiesV2Controller(IPieRepository pieRepository, IMapper mapper, ILogger<PiesController> logger)
+        public PiesController(IPieRepository pieRepository, IMapper mapper, ILogger<PiesController> logger)
         {
             _pieRepository = pieRepository;
             _mapper = mapper;

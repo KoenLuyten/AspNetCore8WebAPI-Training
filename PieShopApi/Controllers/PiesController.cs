@@ -10,7 +10,9 @@ using System.Xml.Linq;
 namespace PieShopApi.Controllers
 {
     [ApiController]
+    [ApiVersion("1.0", Deprecated = true)]
     [Route("v{version:apiVersion}/pies")]
+    //[Obsolete]
     //[LoggingFilter]
     public class PiesController : ControllerBase
     {
@@ -40,9 +42,9 @@ namespace PieShopApi.Controllers
         [Produces("application/json", "application/xml")]
         public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies([FromQuery] PieListParameters parameters)
         {
-            var pieList = await _pieRepository.ListPiesAsync(parameters.Category, 
-                                                             parameters.SearchTerm, 
-                                                             parameters.PageNumber, 
+            var pieList = await _pieRepository.ListPiesAsync(parameters.Category,
+                                                             parameters.SearchTerm,
+                                                             parameters.PageNumber,
                                                              parameters.PageSize);
 
             var metadata = new
@@ -131,7 +133,7 @@ namespace PieShopApi.Controllers
         [Route("{id:int}")]
         [ProducesResponseType(204)]
         [ProducesResponseType(400)]
-        [ProducesResponseType(404)]        
+        [ProducesResponseType(404)]
         public async Task<ActionResult<Pie>> UpdatePie(int id, PieForUpdateDto pie)
         {
             var currentPie = await _pieRepository.GetByIdAsync(id);
