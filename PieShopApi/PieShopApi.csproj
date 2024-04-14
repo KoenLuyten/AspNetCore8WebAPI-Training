@@ -6,6 +6,15 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <ApplicationInsightsResourceId>/subscriptions/3258674b-7534-4b9d-ad14-6e3073fdbbcc/resourceGroups/rg-apitraining-demo/providers/microsoft.insights/components/kl-apitraining-demo</ApplicationInsightsResourceId>
     <UserSecretsId>1689b487-c356-4e8a-aadc-1d581bc8bfe6</UserSecretsId>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <NoWarn>1701;1702;1591</NoWarn>
   </PropertyGroup>
 
   <ItemGroup>

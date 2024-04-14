@@ -103,6 +103,10 @@ builder.Services.AddSwaggerGen(c =>
             Url = new Uri("https://xebia.com/license"),
         }
     });
+
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();

@@ -22,9 +22,15 @@ namespace PieShopApi.Models.Pies
             set => _pageSize = (value > maxPageSize) ? maxPageSize : value;
         }
 
+        /// <summary>
+        /// The search term to do a text based search on name, description and category
+        /// </summary>
         [FromQuery(Name = "search")]
         public string? SearchTerm { get; set; }
 
+        /// <summary>
+        /// The category to filter the pies on
+        /// </summary>
         [FromQuery(Name = "category")]
         public string? Category { get; set; }
     }

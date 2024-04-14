@@ -24,6 +24,11 @@ namespace PieShopApi.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Gets a paged list of pies
+        /// </summary>
+        /// <param name="parameters">the filter, search and paging parameters</param>
+        /// <returns></returns>
         [HttpGet]
         //[LoggingFilter]
         public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies([FromQuery] PieListParameters parameters)
@@ -48,6 +53,11 @@ namespace PieShopApi.Controllers
             return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieList));
         }
 
+        /// <summary>
+        /// Gets a pie based on its id
+        /// </summary>
+        /// <param name="id">The id of the Pie</param>
+        /// <returns></returns>
         [HttpGet]
         [PieAllergyFilter]
         [EnableRateLimiting("myWindowLimiter")]
