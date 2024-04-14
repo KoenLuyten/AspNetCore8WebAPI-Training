@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using PieShopApi.Filters;
+using PieShopApi.Formatters;
 using PieShopApi.Persistence;
 using System.Reflection;
 using System.Threading.RateLimiting;
@@ -58,6 +59,7 @@ builder.Services.AddControllers((options) =>
     });
     options.RespectBrowserAcceptHeader = true;
     options.ReturnHttpNotAcceptable = true;
+    options.OutputFormatters.Add(new PieCsvFormatter());
 }).AddXmlDataContractSerializerFormatters();
 
 //builder.Services.AddOutputCache();
