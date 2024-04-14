@@ -36,6 +36,7 @@ namespace PieShopApi.Controllers
         /// <returns>Paged List of Pies</returns>
         [HttpGet]
         //[LoggingFilter]
+        [Produces("application/json", "application/xml")]
         public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies([FromQuery] PieListParameters parameters)
         {
             var pieList = await _pieRepository.ListPiesAsync(parameters.Category, 
