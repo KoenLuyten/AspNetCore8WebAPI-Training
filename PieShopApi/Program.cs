@@ -33,8 +33,10 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowLocalhost7282", builder => builder.WithOrigins("https://localhost:7282")
                                                               .AllowAnyMethod()
                                                               .AllowAnyHeader());
-    
+
 });
+
+builder.Services.AddResponseCaching();
 
 builder.Services.AddRateLimiter(_ => _
     .AddFixedWindowLimiter(policyName: "myWindowLimiter", options =>
@@ -49,6 +51,11 @@ builder.Services.AddRateLimiter(_ => _
 builder.Services.AddControllers((options) =>
 {
     options.Filters.Add<LoggingFilterAttribute>();
+    options.CacheProfiles.Add("Cache2Minutes", new CacheProfile
+    {
+        Duration = 120,
+        Location = ResponseCacheLocation.Any
+    });
 });
 
 builder.Services.AddProblemDetails(
@@ -66,11 +73,13 @@ var app = builder.Build();
 //app.UseCors("AllowLocalhost7282");
 app.UseCors("AllowAll");
 
+app.UseResponseCaching();
+
 app.UseRateLimiter();
 
 app.MapControllers();
 
-if(!app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler(options =>
     {

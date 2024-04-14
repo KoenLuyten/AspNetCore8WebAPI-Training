@@ -25,4 +25,43 @@ Welcome to your new app.
         });
 </script>
 
+<hr />
 
+<button id="responseCacheButton">Get the date/time</button> <br />
+<ul id="responseCacheDatetime"></ul>
+
+<script type="text/javascript">
+    document.getElementById('responseCacheButton').addEventListener('click', function () {
+        fetch('https://localhost:7043/datetime/fromresponsecache')
+            .then(response => response.text())
+            .then(data => {
+                var li = document.createElement('li');
+                li.textContent = new Date(JSON.parse(data).dateTime).toLocaleString();
+                document.getElementById('responseCacheDatetime').appendChild(li);
+            });
+    });
+</script>
+
+<hr />
+
+<label>Id:</label><input type="number" id="responseCacheByIdInput" value="1"/><br />
+<label>Name:</label><input type="text" id="responseCacheByIdNameInput" value="Koen"/><br />
+<button id="responseCacheByIdButton">Get the date/time</button>
+<br />
+<ul id="responseCacheByIdDatetime"></ul>
+
+<script type="text/javascript">
+    document.getElementById('responseCacheByIdButton').addEventListener('click', function () {
+        var id = document.getElementById('responseCacheByIdInput').value;
+        var user = document.getElementById('responseCacheByIdNameInput').value;
+        fetch(`https://localhost:7043/datetime/fromresponsecachebyid?id=${id}&user=${user}`)
+            .then(response => response.text())
+            .then(data => {
+                var li = document.createElement('li');
+                li.textContent = data;
+                document.getElementById('responseCacheByIdDatetime').appendChild(li);
+            });
+    });
+</script>
+
+<hr />
