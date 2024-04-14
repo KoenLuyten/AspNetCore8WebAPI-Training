@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using PieShopApi.Filters;
 using PieShopApi.Persistence;
 using System.Reflection;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,6 +36,16 @@ builder.Services.AddCors(options =>
     
 });
 
+builder.Services.AddRateLimiter(_ => _
+    .AddFixedWindowLimiter(policyName: "myWindowLimiter", options =>
+    {
+        options.PermitLimit = 4;
+        options.Window = TimeSpan.FromSeconds(60);
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 2;
+    })
+    .RejectionStatusCode = 429);
+
 builder.Services.AddControllers((options) =>
 {
     options.Filters.Add<LoggingFilterAttribute>();
@@ -53,6 +65,8 @@ var app = builder.Build();
 //app.UseCors("AllowLocalhost8080");
 //app.UseCors("AllowLocalhost7282");
 app.UseCors("AllowAll");
+
+app.UseRateLimiter();
 
 app.MapControllers();
 

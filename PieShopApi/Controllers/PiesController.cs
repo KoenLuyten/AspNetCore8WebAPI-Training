@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using PieShopApi.Filters;
 using PieShopApi.Models.Pies;
 using PieShopApi.Persistence;
@@ -49,6 +50,7 @@ namespace PieShopApi.Controllers
 
         [HttpGet]
         [PieAllergyFilter]
+        [EnableRateLimiting("myWindowLimiter")]
         [Route("{id:int}", Name = "GetPie")]
         public async Task<ActionResult<PieDto>> GetPie(int id)
         {
