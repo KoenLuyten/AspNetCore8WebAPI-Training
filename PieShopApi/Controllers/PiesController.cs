@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using PieShopApi.Filters;
@@ -70,6 +71,7 @@ namespace PieShopApi.Controllers
         [Route("{id:int}", Name = "GetPie")]
         [ProducesResponseType(404)]
         [ProducesResponseType(200)]
+        [Produces("application/json", "application/xml", "application/csv")]
         public async Task<ActionResult<PieDto>> GetPie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
