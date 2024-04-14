@@ -56,7 +56,9 @@ builder.Services.AddControllers((options) =>
         Duration = 120,
         Location = ResponseCacheLocation.Any
     });
-});
+    options.RespectBrowserAcceptHeader = true;
+    options.ReturnHttpNotAcceptable = true;
+}).AddXmlDataContractSerializerFormatters();
 
 //builder.Services.AddOutputCache();
 

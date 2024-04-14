@@ -194,3 +194,18 @@ POST {{PieShopApi_HostAddress}}/datetime/purge/tag-datetime
 ###
 
 GET {{PieShopApi_HostAddress}}/datetime/fromoutputcache
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/1
+Accept: application/json
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/1
+Accept: application/xml
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/1
+Accept: application/csv
