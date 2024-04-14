@@ -1,8 +1,11 @@
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using PieShopApi.Filters;
 using PieShopApi.Formatters;
 using PieShopApi.Persistence;
@@ -81,6 +84,50 @@ builder.Services.AddProblemDetails(
 );
 builder.Services.AddApplicationInsightsTelemetry();
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(2, 0);
+}).AddApiExplorer(options =>
+{
+    options.SubstituteApiVersionInUrl = true;
+});
+
+builder.Services.AddEndpointsApiExplorer();
+
+var apiVersionDescriptionProvider = builder.Services.BuildServiceProvider()
+                                                    .GetRequiredService<IApiVersionDescriptionProvider>();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+    {
+        c.SwaggerDoc($"{description.GroupName}", new OpenApiInfo
+        {
+            Title = "PieShop",
+            Version = description.ApiVersion.ToString(),
+            Description = "Api to get the pies",
+            TermsOfService = new Uri("https://xebia.com/terms"),
+            Contact = new OpenApiContact
+            {
+                Name = "John Doe",
+                Email = "John.Doe@xebia.com",
+                Url = new Uri("https://www.xebia.com"),
+            },
+            License = new OpenApiLicense
+            {
+                Name = "PieShop License",
+                Url = new Uri("https://xebia.com/license"),
+            }
+        });
+    }
+
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        c.IncludeXmlComments(xmlPath);
+});
+
 var app = builder.Build();
 
 //app.UseCors("AllowLocalhost8080");
@@ -90,6 +137,15 @@ app.UseCors("AllowAll");
 app.UseResponseCaching();
 
 app.UseRateLimiter();
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+    {
+        c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+    }
+});
 
 app.MapControllers();
 

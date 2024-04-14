@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Asp.Versioning;
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using PieShopApi.Filters;
@@ -9,7 +10,9 @@ using System.Xml.Linq;
 namespace PieShopApi.Controllers
 {
     [ApiController]
-    [Route("pies")]
+    [ApiVersion("1.0", Deprecated = true)]
+    [Route("v{version:apiVersion}/pies")]
+    [Obsolete]
     //[LoggingFilter]
     public class PiesController : ControllerBase
     {
@@ -24,13 +27,24 @@ namespace PieShopApi.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Gets a paged list of pies
+        /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     GET /pies?category=fruit&amp;search=apple&amp;pageNumber=1&amp;pageSize=10
+        /// </remarks>
+        /// <param name="parameters">the filter, search and paging parameters</param>
+        /// <returns>Paged List of Pies</returns>
         [HttpGet]
         //[LoggingFilter]
+        [Produces("application/json", "application/xml")]
         public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies([FromQuery] PieListParameters parameters)
         {
-            var pieList = await _pieRepository.ListPiesAsync(parameters.Category, 
-                                                             parameters.SearchTerm, 
-                                                             parameters.PageNumber, 
+            var pieList = await _pieRepository.ListPiesAsync(parameters.Category,
+                                                             parameters.SearchTerm,
+                                                             parameters.PageNumber,
                                                              parameters.PageSize);
 
             var metadata = new
@@ -48,10 +62,18 @@ namespace PieShopApi.Controllers
             return Ok(_mapper.Map<IEnumerable<PieForListDto>>(pieList));
         }
 
+        /// <summary>
+        /// Gets a pie based on its id
+        /// </summary>
+        /// <param name="id">The id of the Pie</param>
+        /// <returns>Pie for provided id</returns>
         [HttpGet]
         [PieAllergyFilter]
         [EnableRateLimiting("myWindowLimiter")]
         [Route("{id:int}", Name = "GetPie")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
+        [Produces("application/json", "application/xml", "application/csv")]
         public async Task<ActionResult<PieDto>> GetPie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
@@ -66,6 +88,8 @@ namespace PieShopApi.Controllers
 
         [HttpGet]
         [Route("search")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
         public async Task<ActionResult<Pie>> SearchPie(string name)
         {
             var pie = await _pieRepository.GetByPartialNameAsync(name);
@@ -92,6 +116,8 @@ namespace PieShopApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult<Pie>> CreatePie(PieForCreationDto pie)
         {
             var pieToAdd = _mapper.Map<Pie>(pie);
@@ -105,6 +131,9 @@ namespace PieShopApi.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]
         public async Task<ActionResult<Pie>> UpdatePie(int id, PieForUpdateDto pie)
         {
             var currentPie = await _pieRepository.GetByIdAsync(id);
@@ -123,6 +152,8 @@ namespace PieShopApi.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
         public async Task<ActionResult> DeletePie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
