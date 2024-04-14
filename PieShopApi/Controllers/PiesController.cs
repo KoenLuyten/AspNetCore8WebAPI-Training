@@ -12,7 +12,7 @@ namespace PieShopApi.Controllers
     [ApiController]
     [ApiVersion("1.0", Deprecated = true)]
     [Route("v{version:apiVersion}/pies")]
-    //[Obsolete]
+    [Obsolete]
     //[LoggingFilter]
     public class PiesController : ControllerBase
     {
