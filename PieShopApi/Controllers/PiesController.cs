@@ -67,6 +67,8 @@ namespace PieShopApi.Controllers
         [PieAllergyFilter]
         [EnableRateLimiting("myWindowLimiter")]
         [Route("{id:int}", Name = "GetPie")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
         public async Task<ActionResult<PieDto>> GetPie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
@@ -81,6 +83,8 @@ namespace PieShopApi.Controllers
 
         [HttpGet]
         [Route("search")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(200)]
         public async Task<ActionResult<Pie>> SearchPie(string name)
         {
             var pie = await _pieRepository.GetByPartialNameAsync(name);
@@ -107,6 +111,8 @@ namespace PieShopApi.Controllers
         }
 
         [HttpPost]
+        [ProducesResponseType(201)]
+        [ProducesResponseType(400)]
         public async Task<ActionResult<Pie>> CreatePie(PieForCreationDto pie)
         {
             var pieToAdd = _mapper.Map<Pie>(pie);
@@ -120,6 +126,9 @@ namespace PieShopApi.Controllers
 
         [HttpPut]
         [Route("{id:int}")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(404)]        
         public async Task<ActionResult<Pie>> UpdatePie(int id, PieForUpdateDto pie)
         {
             var currentPie = await _pieRepository.GetByIdAsync(id);
@@ -138,6 +147,8 @@ namespace PieShopApi.Controllers
 
         [HttpDelete]
         [Route("{id:int}")]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(204)]
         public async Task<ActionResult> DeletePie(int id)
         {
             var pie = await _pieRepository.GetByIdAsync(id);
