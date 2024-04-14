@@ -27,8 +27,13 @@ namespace PieShopApi.Controllers
         /// <summary>
         /// Gets a paged list of pies
         /// </summary>
+        /// <remarks>
+        /// Sample request:
+        /// 
+        ///     GET /pies?category=fruit&amp;search=apple&amp;pageNumber=1&amp;pageSize=10
+        /// </remarks>
         /// <param name="parameters">the filter, search and paging parameters</param>
-        /// <returns></returns>
+        /// <returns>Paged List of Pies</returns>
         [HttpGet]
         //[LoggingFilter]
         public async Task<ActionResult<IEnumerable<PieForListDto>>> GetPies([FromQuery] PieListParameters parameters)
@@ -57,7 +62,7 @@ namespace PieShopApi.Controllers
         /// Gets a pie based on its id
         /// </summary>
         /// <param name="id">The id of the Pie</param>
-        /// <returns></returns>
+        /// <returns>Pie for provided id</returns>
         [HttpGet]
         [PieAllergyFilter]
         [EnableRateLimiting("myWindowLimiter")]
