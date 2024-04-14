@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.9.34701.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PieShopApi", "PieShopApi\PieShopApi.csproj", "{ABB46574-2D69-413F-B0A1-0E600522DD65}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PieShopApi", "PieShopApi\PieShopApi.csproj", "{ABB46574-2D69-413F-B0A1-0E600522DD65}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PieShopConsoleClient", "PieShopConsoleClient\PieShopConsoleClient.csproj", "{8B9ADCC9-FBD9-4AFF-B16F-4EDF8BE9FB7C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PieShopConsoleClient", "PieShopConsoleClient\PieShopConsoleClient.csproj", "{8B9ADCC9-FBD9-4AFF-B16F-4EDF8BE9FB7C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PieShopApiTests", "PieShopApiTests\PieShopApiTests.csproj", "{8A73106D-47E7-4890-B6B6-DF4D2C468C30}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PieShopApiIntegrationTests", "PieShopApiIntegrationTests\PieShopApiIntegrationTests.csproj", "{E882832E-A605-4F46-BD4D-633B5B8F9EC1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PieShopBlazorClient", "PieShopBlazorClient\PieShopBlazorClient.csproj", "{2775AB80-1CE3-4169-BDCC-9217345181DE}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{E882832E-A605-4F46-BD4D-633B5B8F9EC1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E882832E-A605-4F46-BD4D-633B5B8F9EC1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E882832E-A605-4F46-BD4D-633B5B8F9EC1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2775AB80-1CE3-4169-BDCC-9217345181DE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2775AB80-1CE3-4169-BDCC-9217345181DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2775AB80-1CE3-4169-BDCC-9217345181DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2775AB80-1CE3-4169-BDCC-9217345181DE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -1,10 +1,13 @@
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
 using PieShopApi.Filters;
+using PieShopApi.Formatters;
 using PieShopApi.Persistence;
 using System.Reflection;
+using System.Threading.RateLimiting;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,9 +22,54 @@ builder.Services.AddSingleton(new FileExtensionContentTypeProvider());
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+    options.AddPolicy("AllowLocalhost8080", builder => builder.WithOrigins("https://localhost:8080")
+                                                              .AllowAnyMethod()
+                                                              .AllowAnyHeader());
+
+    // 7282 is the port number of the Blazor WebAssembly app
+    options.AddPolicy("AllowLocalhost7282", builder => builder.WithOrigins("https://localhost:7282")
+                                                              .AllowAnyMethod()
+                                                              .AllowAnyHeader());
+
+});
+
+builder.Services.AddResponseCaching();
+
+builder.Services.AddRateLimiter(_ => _
+    .AddFixedWindowLimiter(policyName: "myWindowLimiter", options =>
+    {
+        options.PermitLimit = 4;
+        options.Window = TimeSpan.FromSeconds(60);
+        options.QueueProcessingOrder = QueueProcessingOrder.OldestFirst;
+        options.QueueLimit = 2;
+    })
+    .RejectionStatusCode = 429);
+
 builder.Services.AddControllers((options) =>
 {
     options.Filters.Add<LoggingFilterAttribute>();
+    options.CacheProfiles.Add("Cache2Minutes", new CacheProfile
+    {
+        Duration = 120,
+        Location = ResponseCacheLocation.Any
+    });
+    options.RespectBrowserAcceptHeader = true;
+    options.ReturnHttpNotAcceptable = true;
+    options.OutputFormatters.Add(new PieCsvFormatter());
+}).AddXmlDataContractSerializerFormatters();
+
+//builder.Services.AddOutputCache();
+
+builder.Services.AddOutputCache(options =>
+{
+    //options.AddBasePolicy(builder =>
+    //    builder.Expire(TimeSpan.FromSeconds(10)));
+    options.AddPolicy("CacheForThirtySeconds", builder =>
+        builder.Expire(TimeSpan.FromSeconds(30)));
 });
 
 builder.Services.AddProblemDetails(
@@ -35,9 +83,19 @@ builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
 
+//app.UseCors("AllowLocalhost8080");
+//app.UseCors("AllowLocalhost7282");
+app.UseCors("AllowAll");
+
+app.UseResponseCaching();
+
+app.UseRateLimiter();
+
 app.MapControllers();
 
-if(!app.Environment.IsDevelopment())
+app.UseOutputCache();
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler(options =>
     {

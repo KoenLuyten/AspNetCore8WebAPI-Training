@@ -162,3 +162,50 @@ GET {{PieShopApi_HostAddress}}/Pies?search=choco
 ###
 
 GET {{PieShopApi_HostAddress}}/Pies?page=1&size=5&category=Fruit&search=pie
+
+###
+
+GET {{PieShopApi_HostAddress}}/datetime/fromoutputcache
+X-CacheKey: Foo
+
+###
+
+GET {{PieShopApi_HostAddress}}/datetime/fromoutputcache
+X-CacheKey: Bar
+
+###
+
+GET {{PieShopApi_HostAddress}}/datetime/fromoutputcacherevalidation
+
+###
+
+GET {{PieShopApi_HostAddress}}/datetime/fromoutputcacherevalidation
+If-None-Match: "d52cfdfaed374b039b4a1284d7ea402c"
+
+
+###
+
+GET {{PieShopApi_HostAddress}}/datetime/fromoutputcacheeviction
+
+###
+
+POST {{PieShopApi_HostAddress}}/datetime/purge/tag-datetime
+
+###
+
+GET {{PieShopApi_HostAddress}}/datetime/fromoutputcache
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/1
+Accept: application/json
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/1
+Accept: application/xml
+
+###
+
+GET {{PieShopApi_HostAddress}}/pies/1
+Accept: application/csv
