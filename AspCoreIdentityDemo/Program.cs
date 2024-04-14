@@ -1,4 +1,5 @@
 using AspCoreIdentityDemo;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
@@ -9,6 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<ApplicationDbContext>(
     options => options.UseInMemoryDatabase("AppDb"));
+
+builder.Services.AddSingleton<IAuthorizationHandler, MinimumAgeHandler>();
+builder.Services.AddAuthorization(options => options.AddPolicy("LegalDrinkingAge", policy =>
+        policy.Requirements.Add(new MinimumAgeRequirement(21))
+    ));
 
 builder.Services
     .AddIdentityApiEndpoints<IdentityUser>()
@@ -66,7 +72,18 @@ app.MapControllers();
 
 await SeedRole("admin");
 await SeedRole("superadmin");
-await SeedUser("koen.luyten@xebia.com", "Test!123", "admin");
+var claimsKoen = new List<Claim>
+{
+    new Claim(ClaimTypes.DateOfBirth, new DateTime(1985,11,6).ToShortDateString()),
+    new Claim(ClaimTypes.Country, "BE")
+};
+var claimsJunior = new List<Claim>
+{
+    new Claim(ClaimTypes.DateOfBirth, DateTime.Now.AddYears(-15).ToShortDateString()),
+    new Claim(ClaimTypes.Country, "BE")
+};
+await SeedUser("koen.luyten@xebia.com", "Test!123", "admin", claimsKoen);
+await SeedUser("junior@xebia.com", "Test!123", "admin", claimsJunior);
 
 app.Run();
 
@@ -76,7 +93,7 @@ async Task SeedRole(string role)
     await roleManager.CreateAsync(new IdentityRole(role));
 }
 
-async Task SeedUser(string email, string password, string role)
+async Task SeedUser(string email, string password, string role, IEnumerable<Claim> claims)
 {
     var userManager = builder.Services.BuildServiceProvider().GetRequiredService<UserManager<IdentityUser>>();
 
@@ -89,4 +106,5 @@ async Task SeedUser(string email, string password, string role)
 
     await userManager.CreateAsync(user, password);
     await userManager.AddToRoleAsync(user, role);
+    await userManager.AddClaimsAsync(user, claims);
 }
