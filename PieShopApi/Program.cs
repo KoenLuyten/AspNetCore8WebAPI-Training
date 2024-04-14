@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.AspNetCore.StaticFiles;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using PieShopApi.Filters;
 using PieShopApi.Formatters;
 using PieShopApi.Persistence;
@@ -82,7 +83,27 @@ builder.Services.AddProblemDetails(
 builder.Services.AddApplicationInsightsTelemetry();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new OpenApiInfo
+    {
+        Title = "PieShop",
+        Version = "v1 version",
+        Description = "Api to get the pies",
+        TermsOfService = new Uri("https://xebia.com/terms"),
+        Contact = new OpenApiContact
+        {
+            Name = "John Doe",
+            Email = "John.Doe@xebia.com",
+            Url = new Uri("https://www.xebia.com"),
+        },
+        License = new OpenApiLicense
+        {
+            Name = "PieShop License",
+            Url = new Uri("https://xebia.com/license"),
+        }
+    });
+});
 
 var app = builder.Build();
 
