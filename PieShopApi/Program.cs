@@ -81,6 +81,9 @@ builder.Services.AddProblemDetails(
 );
 builder.Services.AddApplicationInsightsTelemetry();
 
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 //app.UseCors("AllowLocalhost8080");
@@ -90,6 +93,9 @@ app.UseCors("AllowAll");
 app.UseResponseCaching();
 
 app.UseRateLimiter();
+
+app.UseSwagger();
+app.UseSwaggerUI();
 
 app.MapControllers();
 
