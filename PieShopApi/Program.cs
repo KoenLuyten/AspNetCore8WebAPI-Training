@@ -1,3 +1,5 @@
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
@@ -82,31 +84,45 @@ builder.Services.AddProblemDetails(
 );
 builder.Services.AddApplicationInsightsTelemetry();
 
+builder.Services.AddApiVersioning(options =>
+{
+    options.ReportApiVersions = true;
+    options.AssumeDefaultVersionWhenUnspecified = true;
+    options.DefaultApiVersion = new ApiVersion(1, 0);
+}).AddApiExplorer();
+
 builder.Services.AddEndpointsApiExplorer();
+
+var apiVersionDescriptionProvider = builder.Services.BuildServiceProvider()
+                                                    .GetRequiredService<IApiVersionDescriptionProvider>();
+
 builder.Services.AddSwaggerGen(c =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo
+    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
     {
-        Title = "PieShop",
-        Version = "v1 version",
-        Description = "Api to get the pies",
-        TermsOfService = new Uri("https://xebia.com/terms"),
-        Contact = new OpenApiContact
+        c.SwaggerDoc($"{description.GroupName}", new OpenApiInfo
         {
-            Name = "John Doe",
-            Email = "John.Doe@xebia.com",
-            Url = new Uri("https://www.xebia.com"),
-        },
-        License = new OpenApiLicense
-        {
-            Name = "PieShop License",
-            Url = new Uri("https://xebia.com/license"),
-        }
-    });
+            Title = "PieShop",
+            Version = description.ApiVersion.ToString(),
+            Description = "Api to get the pies",
+            TermsOfService = new Uri("https://xebia.com/terms"),
+            Contact = new OpenApiContact
+            {
+                Name = "John Doe",
+                Email = "John.Doe@xebia.com",
+                Url = new Uri("https://www.xebia.com"),
+            },
+            License = new OpenApiLicense
+            {
+                Name = "PieShop License",
+                Url = new Uri("https://xebia.com/license"),
+            }
+        });
+    }
 
-    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
+        var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+        var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+        c.IncludeXmlComments(xmlPath);
 });
 
 var app = builder.Build();
@@ -120,7 +136,13 @@ app.UseResponseCaching();
 app.UseRateLimiter();
 
 app.UseSwagger();
-app.UseSwaggerUI();
+app.UseSwaggerUI(c =>
+{
+    foreach (var description in apiVersionDescriptionProvider.ApiVersionDescriptions)
+    {
+        c.SwaggerEndpoint($"/swagger/{description.GroupName}/swagger.json", description.GroupName.ToUpperInvariant());
+    }
+});
 
 app.MapControllers();
 
