@@ -8,7 +8,7 @@ namespace PieShopApi.Controllers
 {
     [ApiController]
     [ApiVersion("2.0")]
-    [Route("pies")]
+    [Route("v{version:apiVersion}/pies")]
     //[LoggingFilter]
     public class PiesV2Controller : ControllerBase
     {

@@ -10,7 +10,7 @@ using System.Xml.Linq;
 namespace PieShopApi.Controllers
 {
     [ApiController]
-    [Route("pies")]
+    [Route("v{version:apiVersion}/pies")]
     //[LoggingFilter]
     public class PiesController : ControllerBase
     {
