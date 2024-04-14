@@ -58,6 +58,16 @@ builder.Services.AddControllers((options) =>
     });
 });
 
+//builder.Services.AddOutputCache();
+
+builder.Services.AddOutputCache(options =>
+{
+    //options.AddBasePolicy(builder =>
+    //    builder.Expire(TimeSpan.FromSeconds(10)));
+    options.AddPolicy("CacheForThirtySeconds", builder =>
+        builder.Expire(TimeSpan.FromSeconds(30)));
+});
+
 builder.Services.AddProblemDetails(
     options =>
         options.CustomizeProblemDetails = ctx =>
@@ -78,6 +88,8 @@ app.UseResponseCaching();
 app.UseRateLimiter();
 
 app.MapControllers();
+
+app.UseOutputCache();
 
 if (!app.Environment.IsDevelopment())
 {
