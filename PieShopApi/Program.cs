@@ -19,6 +19,21 @@ builder.Services.AddSingleton(new FileExtensionContentTypeProvider());
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder => builder.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+
+    options.AddPolicy("AllowLocalhost8080", builder => builder.WithOrigins("https://localhost:8080")
+                                                              .AllowAnyMethod()
+                                                              .AllowAnyHeader());
+
+    // 7282 is the port number of the Blazor WebAssembly app
+    options.AddPolicy("AllowLocalhost7282", builder => builder.WithOrigins("https://localhost:7282")
+                                                              .AllowAnyMethod()
+                                                              .AllowAnyHeader());
+    
+});
+
 builder.Services.AddControllers((options) =>
 {
     options.Filters.Add<LoggingFilterAttribute>();
@@ -34,6 +49,10 @@ builder.Services.AddProblemDetails(
 builder.Services.AddApplicationInsightsTelemetry();
 
 var app = builder.Build();
+
+//app.UseCors("AllowLocalhost8080");
+//app.UseCors("AllowLocalhost7282");
+app.UseCors("AllowAll");
 
 app.MapControllers();
 

@@ -1,0 +1,28 @@
+﻿@page "/"
+@* @inject IPieApiClient PieServiceClient *@
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+
+<h2>Here are some pies</h2>
+
+<ul id="pieList">
+
+</ul>
+
+<script type="text/javascript">
+    fetch('https://localhost:7043/pies')
+        .then(response => response.json())
+        .then(data => {
+            data.forEach(pie => {
+                var li = document.createElement('li');
+                li.textContent = pie.name;
+                document.getElementById('pieList').appendChild(li);
+            });
+        });
+</script>
+
+
