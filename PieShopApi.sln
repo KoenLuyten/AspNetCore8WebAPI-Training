@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PieShopApiIntegrationTests"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PieShopBlazorClient", "PieShopBlazorClient\PieShopBlazorClient.csproj", "{2775AB80-1CE3-4169-BDCC-9217345181DE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AspCoreIdentityDemo", "AspCoreIdentityDemo\AspCoreIdentityDemo.csproj", "{FAF46443-A7EC-459C-87FD-468D28C784C4}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{2775AB80-1CE3-4169-BDCC-9217345181DE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2775AB80-1CE3-4169-BDCC-9217345181DE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2775AB80-1CE3-4169-BDCC-9217345181DE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FAF46443-A7EC-459C-87FD-468D28C784C4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FAF46443-A7EC-459C-87FD-468D28C784C4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FAF46443-A7EC-459C-87FD-468D28C784C4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FAF46443-A7EC-459C-87FD-468D28C784C4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
