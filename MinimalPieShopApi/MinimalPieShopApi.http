@@ -45,3 +45,18 @@ GET {{MinimalPieShopApi_HostAddress}}/pies?pageNumber=1&pageSize=2
 ###
 
 GET {{MinimalPieShopApi_HostAddress}}/pies?category=Nutty&PageNumber=1&PageSize=10
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies/999
+
+###
+
+PUT {{MinimalPieShopApi_HostAddress}}/pies/999
+Content-Type: application/json
+
+{
+  "name": "Smurf pie",
+  "description": "white chocolat and apricot",
+  "category": "Chocolatey"
+}
