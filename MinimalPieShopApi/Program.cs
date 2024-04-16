@@ -1,7 +1,9 @@
+using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinimalPieShopApi.Models;
 using MinimalPieShopApi.Persistence;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -13,6 +15,7 @@ builder.Services.AddDbContext<PieShopDbContext>(options =>
 builder.Services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
 builder.Services.AddScoped<IPieRepository, PieRepository>();
 
+builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -49,25 +52,33 @@ var pieGroup = app.MapGroup("/pies/")
 //    return pieList.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 //});
 
-pieGroup.MapGet("", async (string? category, string? searchTerm, [AsParameters] PieListParameters pageParams, [FromServices] IPieRepository repository) =>
+pieGroup.MapGet("", async (string? category, string? searchTerm, [AsParameters] PieListParameters pageParams, [FromServices] IPieRepository repository, [FromServices] IMapper mapper) =>
 {
-    return await repository.ListPiesAsync(category, searchTerm, pageParams);
+    var result = await repository.ListPiesAsync(category, searchTerm, pageParams);
+
+    return mapper.Map<IEnumerable<PieForListDto>>(result);
 });
 
 const string GetPieRouteName = "GetPie";
-pieGroup.MapGet("{id}", async (int id, IPieRepository repository) =>
+pieGroup.MapGet("{id}", async (int id, IPieRepository repository, [FromServices] IMapper mapper) =>
 {
-    return await repository.GetByIdAsync(id);
+    var pie = await repository.GetByIdAsync(id);
+
+    return mapper.Map<PieDto>(pie);
 }).WithName(GetPieRouteName);
 
-pieGroup.MapPost("", async (Pie pie, IPieRepository repository) =>
+pieGroup.MapPost("", async (PieForCreationDto pie, IPieRepository repository, [FromServices] IMapper mapper) =>
 {
-    var savedPie = await repository.AddAsync(pie);
+    var pieToCreate = mapper.Map<Pie>(pie);
 
-    return Results.CreatedAtRoute(GetPieRouteName, savedPie);
+    var savedPie = await repository.AddAsync(pieToCreate);
+
+    var pieDto = mapper.Map<PieDto>(savedPie);
+
+    return Results.CreatedAtRoute(GetPieRouteName, pieDto);
 });
 
-pieGroup.MapPut("{id}", async (int id, Pie pie, IPieRepository repository) =>
+pieGroup.MapPut("{id}", async (int id, PieForUpdateDto pie, IPieRepository repository, [FromServices] IMapper mapper) =>
 {
     var existingPie = await repository.GetByIdAsync(id);
     if (existingPie == null)
@@ -75,9 +86,7 @@ pieGroup.MapPut("{id}", async (int id, Pie pie, IPieRepository repository) =>
         return Results.NotFound();
     }
 
-    existingPie.Name = pie.Name;
-    existingPie.Description = pie.Description;
-    existingPie.Category = pie.Category;
+    mapper.Map(pie, existingPie);
 
     await repository.UpdateAsync(existingPie);
 
