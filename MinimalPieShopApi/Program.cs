@@ -1,9 +1,5 @@
-using AutoMapper;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MinimalPieShopApi.Endpoints;
-using MinimalPieShopApi.Models;
 using MinimalPieShopApi.Persistence;
 using System.Reflection;
 
@@ -19,11 +15,30 @@ builder.Services.AddScoped<IPieRepository, PieRepository>();
 
 builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
 
+builder.Services.AddProblemDetails();
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
+
+if (!app.Environment.IsDevelopment())
+{
+    app.UseExceptionHandler(exceptionHandlerApp =>
+    {
+        exceptionHandlerApp.Run(async httpContext =>
+        {
+            var pds = httpContext.RequestServices.GetService<IProblemDetailsService>();
+            if (pds == null
+                || !await pds.TryWriteAsync(new() { HttpContext = httpContext }))
+            {
+                // Fallback behavior
+                await httpContext.Response.WriteAsync("Fallback: An error occurred.");
+            }
+        });
+    });
+}
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -35,6 +50,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.MapPieEndpoints();
+
+app.MapGet("/error", () => { throw new NotImplementedException(); });
 
 using (var context = new PieShopDbContext(builder.Services.BuildServiceProvider()
     .GetRequiredService<DbContextOptions<PieShopDbContext>>()))

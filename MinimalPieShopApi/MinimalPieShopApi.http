@@ -60,3 +60,7 @@ Content-Type: application/json
   "description": "white chocolat and apricot",
   "category": "Chocolatey"
 }
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/error
