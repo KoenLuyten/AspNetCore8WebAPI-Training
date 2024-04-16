@@ -37,3 +37,7 @@ Content-Type: application/json
 ###
 
 GET {{MinimalPieShopApi_HostAddress}}/pies/4
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies?pageNumber=1&pageSize=2

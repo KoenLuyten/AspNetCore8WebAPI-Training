@@ -28,9 +28,19 @@ var pieList = new List<Pie>
 var pieGroup = app.MapGroup("/pies/")
                   .WithTags("Pie Endpoints");
 
-pieGroup.MapGet("", () =>
+//pieGroup.MapGet("", () =>
+//{
+//    return pieList;
+//});
+
+//pieGroup.MapGet("", (int pageNumber = 1, int pageSize = 10) =>
+//{
+//    return pieList.Skip((pageNumber - 1) * pageSize).Take(pageSize);
+//});
+
+pieGroup.MapGet("", ([AsParameters]PieListParameters pageParams) =>
 {
-    return pieList;
+    return pieList.Skip((pageParams.PageNumber - 1) * pageParams.PageSize).Take(pageParams.PageSize);
 });
 
 const string GetPieRouteName = "GetPie";
