@@ -25,24 +25,27 @@ var pieList = new List<Pie>
     new Pie { Id = 3, Name = "Pumpkin Pie", Description = "Delicious", Category = "Vegetable" }
 };
 
-app.MapGet("/pies", () =>
+var pieGroup = app.MapGroup("/pies/")
+                  .WithTags("Pie Endpoints");
+
+pieGroup.MapGet("", () =>
 {
     return pieList;
 });
 
 const string GetPieRouteName = "GetPie";
-app.MapGet("/pies/{id}", (int id) =>
+pieGroup.MapGet("{id}", (int id) =>
 {
     return pieList.FirstOrDefault(p => p.Id == id);
 }).WithName(GetPieRouteName);
 
-app.MapPost("/pies", (Pie pie) =>
+pieGroup.MapPost("", (Pie pie) =>
 {
     pieList.Add(pie);
     return Results.CreatedAtRoute(GetPieRouteName, pie);
 });
 
-app.MapPut("/pies/{id}", (int id, Pie pie) =>
+pieGroup.MapPut("{id}", (int id, Pie pie) =>
 {
     var existingPie = pieList.FirstOrDefault(p => p.Id == id);
     if (existingPie == null)
@@ -57,7 +60,7 @@ app.MapPut("/pies/{id}", (int id, Pie pie) =>
     return Results.NoContent();
 });
 
-app.MapDelete("/pies/{id}", (int id) =>
+pieGroup.MapDelete("{id}", (int id) =>
 {
     var existingPie = pieList.FirstOrDefault(p => p.Id == id);
     if (existingPie == null)
