@@ -8,69 +8,79 @@ namespace MinimalPieShopApi.Endpoints
 {
     public static class PieEndpoints
     {
+        const string GetPieRouteName = "GetPie";
         public static void MapPieEndpoints(this WebApplication app)
         {
             var pieGroup = app.MapGroup("/pies/")
                   .WithTags("Pie Endpoints");
 
-            pieGroup.MapGet("", async Task<Ok<IEnumerable<PieForListDto>>> (string? category, string? searchTerm, [AsParameters] PieListParameters pageParams, [FromServices] IPieRepository repository, [FromServices] IMapper mapper) =>
+            pieGroup.MapGet("", GetPieList);
+
+            pieGroup.MapGet("{id}", GetPieById).WithName(GetPieRouteName);
+
+            pieGroup.MapPost("", PostPie);
+
+            pieGroup.MapPut("{id}", PutPie);
+
+            pieGroup.MapDelete("{id}", DeletePie);
+        }
+
+        public static async Task<Ok<IEnumerable<PieForListDto>>> GetPieList(string? category, string? searchTerm, [AsParameters] PieListParameters pageParams, [FromServices] IPieRepository repository, [FromServices] IMapper mapper)
+        {
+            var result = await repository.ListPiesAsync(category, searchTerm, pageParams);
+
+            return TypedResults.Ok(mapper.Map<IEnumerable<PieForListDto>>(result));
+        }
+
+        public static async Task<Results<NotFound, Ok<PieDto>>> GetPieById(int id, IPieRepository repository, [FromServices] IMapper mapper)
+        {
+            var pie = await repository.GetByIdAsync(id);
+
+            if (pie == null)
             {
-                var result = await repository.ListPiesAsync(category, searchTerm, pageParams);
+                return TypedResults.NotFound();
+            }
 
-                return TypedResults.Ok(mapper.Map<IEnumerable<PieForListDto>>(result));
-            });
+            return TypedResults.Ok(mapper.Map<PieDto>(pie));
+        }
 
-            const string GetPieRouteName = "GetPie";
-            pieGroup.MapGet("{id}", async Task<Results<NotFound, Ok<PieDto>>> (int id, IPieRepository repository, [FromServices] IMapper mapper) =>
+        public static async Task<CreatedAtRoute> PostPie(PieForCreationDto pie, IPieRepository repository, [FromServices] IMapper mapper)
+        {
+            var pieToCreate = mapper.Map<Pie>(pie);
+
+            var savedPie = await repository.AddAsync(pieToCreate);
+
+            var pieDto = mapper.Map<PieDto>(savedPie);
+
+            return TypedResults.CreatedAtRoute(GetPieRouteName, pieDto);
+        }
+
+        public static async Task<Results<NotFound, NoContent>> PutPie(int id, PieForUpdateDto pie, IPieRepository repository, [FromServices] IMapper mapper)
+        {
+            var existingPie = await repository.GetByIdAsync(id);
+            if (existingPie == null)
             {
-                var pie = await repository.GetByIdAsync(id);
+                return TypedResults.NotFound();
+            }
 
-                if (pie == null)
-                {
-                    return TypedResults.NotFound();
-                }
+            mapper.Map(pie, existingPie);
 
-                return TypedResults.Ok(mapper.Map<PieDto>(pie));
-            }).WithName(GetPieRouteName);
+            await repository.UpdateAsync(existingPie);
 
-            pieGroup.MapPost("", async Task<CreatedAtRoute> (PieForCreationDto pie, IPieRepository repository, [FromServices] IMapper mapper) =>
+            return TypedResults.NoContent();
+        }
+
+        public static async Task<Results<NotFound, NoContent>> DeletePie(int id, IPieRepository repository)
+        {
+            var existingPie = await repository.GetByIdAsync(id);
+            if (existingPie == null)
             {
-                var pieToCreate = mapper.Map<Pie>(pie);
+                return TypedResults.NotFound();
+            }
 
-                var savedPie = await repository.AddAsync(pieToCreate);
+            await repository.DeleteAsync(existingPie);
 
-                var pieDto = mapper.Map<PieDto>(savedPie);
-
-                return TypedResults.CreatedAtRoute(GetPieRouteName, pieDto);
-            });
-
-            pieGroup.MapPut("{id}", async Task<Results<NotFound, NoContent>> (int id, PieForUpdateDto pie, IPieRepository repository, [FromServices] IMapper mapper) =>
-            {
-                var existingPie = await repository.GetByIdAsync(id);
-                if (existingPie == null)
-                {
-                    return TypedResults.NotFound();
-                }
-
-                mapper.Map(pie, existingPie);
-
-                await repository.UpdateAsync(existingPie);
-
-                return TypedResults.NoContent();
-            });
-
-            pieGroup.MapDelete("{id}", async (int id, IPieRepository repository) =>
-            {
-                var existingPie = await repository.GetByIdAsync(id);
-                if (existingPie == null)
-                {
-                    return Results.NotFound();
-                }
-
-                await repository.DeleteAsync(existingPie);
-
-                return Results.NoContent();
-            });
+            return TypedResults.NoContent();
         }
     }
 }
