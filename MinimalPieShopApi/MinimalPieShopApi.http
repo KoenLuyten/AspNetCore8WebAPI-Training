@@ -1,0 +1,66 @@
+@MinimalPieShopApi_HostAddress = http://localhost:5026
+
+GET {{MinimalPieShopApi_HostAddress}}/pies
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies/1
+
+###
+
+POST {{MinimalPieShopApi_HostAddress}}/pies/
+Content-Type: application/json
+
+{
+  "id": 4,
+  "name": "Smurf pie",
+  "description": "white chocolat and apricot",
+  "category": "Fruit"
+}
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies/4
+
+###
+
+PUT {{MinimalPieShopApi_HostAddress}}/pies/4
+Content-Type: application/json
+
+{
+  "id": 4,
+  "name": "Smurf pie",
+  "description": "white chocolat and apricot",
+  "category": "Chocolatey"
+}
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies/4
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies?pageNumber=1&pageSize=2
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies?category=Nutty&PageNumber=1&PageSize=10
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies/999
+
+###
+
+PUT {{MinimalPieShopApi_HostAddress}}/pies/999
+Content-Type: application/json
+
+{
+  "name": "Smurf pie",
+  "description": "white chocolat and apricot",
+  "category": "Chocolatey"
+}
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/error
