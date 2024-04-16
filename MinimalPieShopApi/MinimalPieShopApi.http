@@ -41,3 +41,7 @@ GET {{MinimalPieShopApi_HostAddress}}/pies/4
 ###
 
 GET {{MinimalPieShopApi_HostAddress}}/pies?pageNumber=1&pageSize=2
+
+###
+
+GET {{MinimalPieShopApi_HostAddress}}/pies?category=Nutty&PageNumber=1&PageSize=10

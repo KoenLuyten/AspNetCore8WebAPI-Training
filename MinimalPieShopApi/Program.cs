@@ -1,8 +1,19 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using MinimalPieShopApi.Models;
+using MinimalPieShopApi.Persistence;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
+builder.Services.AddDbContext<PieShopDbContext>(options =>
+    options.UseInMemoryDatabase("PieShopDb")
+           .LogTo(Console.WriteLine));
+
+builder.Services.AddScoped(typeof(IAsyncRepository<>), typeof(RepositoryBase<>));
+builder.Services.AddScoped<IPieRepository, PieRepository>();
+
+
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -38,26 +49,27 @@ var pieGroup = app.MapGroup("/pies/")
 //    return pieList.Skip((pageNumber - 1) * pageSize).Take(pageSize);
 //});
 
-pieGroup.MapGet("", ([AsParameters]PieListParameters pageParams) =>
+pieGroup.MapGet("", async (string? category, string? searchTerm, [AsParameters] PieListParameters pageParams, [FromServices] IPieRepository repository) =>
 {
-    return pieList.Skip((pageParams.PageNumber - 1) * pageParams.PageSize).Take(pageParams.PageSize);
+    return await repository.ListPiesAsync(category, searchTerm, pageParams);
 });
 
 const string GetPieRouteName = "GetPie";
-pieGroup.MapGet("{id}", (int id) =>
+pieGroup.MapGet("{id}", async (int id, IPieRepository repository) =>
 {
-    return pieList.FirstOrDefault(p => p.Id == id);
+    return await repository.GetByIdAsync(id);
 }).WithName(GetPieRouteName);
 
-pieGroup.MapPost("", (Pie pie) =>
+pieGroup.MapPost("", async (Pie pie, IPieRepository repository) =>
 {
-    pieList.Add(pie);
-    return Results.CreatedAtRoute(GetPieRouteName, pie);
+    var savedPie = await repository.AddAsync(pie);
+
+    return Results.CreatedAtRoute(GetPieRouteName, savedPie);
 });
 
-pieGroup.MapPut("{id}", (int id, Pie pie) =>
+pieGroup.MapPut("{id}", async (int id, Pie pie, IPieRepository repository) =>
 {
-    var existingPie = pieList.FirstOrDefault(p => p.Id == id);
+    var existingPie = await repository.GetByIdAsync(id);
     if (existingPie == null)
     {
         return Results.NotFound();
@@ -67,25 +79,29 @@ pieGroup.MapPut("{id}", (int id, Pie pie) =>
     existingPie.Description = pie.Description;
     existingPie.Category = pie.Category;
 
+    await repository.UpdateAsync(existingPie);
+
     return Results.NoContent();
 });
 
-pieGroup.MapDelete("{id}", (int id) =>
+pieGroup.MapDelete("{id}", async (int id, IPieRepository repository) =>
 {
-    var existingPie = pieList.FirstOrDefault(p => p.Id == id);
+    var existingPie = await repository.GetByIdAsync(id);
     if (existingPie == null)
     {
         return Results.NotFound();
     }
 
-    pieList.Remove(existingPie);
+    await repository.DeleteAsync(existingPie);
 
     return Results.NoContent();
 });
 
-app.Run();
-
-internal record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
+using (var context = new PieShopDbContext(builder.Services.BuildServiceProvider()
+    .GetRequiredService<DbContextOptions<PieShopDbContext>>()))
 {
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    context.Database.EnsureDeleted();
+    context.Database.EnsureCreated();
 }
+
+app.Run();
